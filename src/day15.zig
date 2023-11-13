@@ -169,11 +169,11 @@ test "parseInput" {
     try testing.expectEqual(expected, input[0]);
 }
 
-// test "Part 1 example" {
-//     var result = try solve1(testInput, testing.allocator, 10);
+test "Part 1 example" {
+    var result = try solve1(testInput, testing.allocator, 10);
 
-//     try std.testing.expectEqual(@as(u32, 26), result);
-// }
+    try std.testing.expectEqual(@as(u32, 26), result);
+}
 
 test "Part 2 example" {
     var result = try solve2(testInput, testing.allocator, 20);
