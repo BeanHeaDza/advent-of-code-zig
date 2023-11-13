@@ -1,0 +1,153 @@
+const std = @import("std");
+
+const Days = struct {
+    pub const d01 = @import("./day01.zig");
+    pub const d02 = @import("./day02.zig");
+    pub const d03 = @import("./day03.zig");
+    pub const d04 = @import("./day04.zig");
+    pub const d05 = @import("./day05.zig");
+    pub const d06 = @import("./day06.zig");
+    pub const d07 = @import("./day07.zig");
+    pub const d08 = @import("./day08.zig");
+    pub const d09 = @import("./day09.zig");
+    pub const d10 = @import("./day10.zig");
+    pub const d11 = @import("./day11.zig");
+    pub const d12 = @import("./day12.zig");
+    pub const d13 = @import("./day13.zig");
+    pub const d14 = @import("./day14.zig");
+    pub const d15 = @import("./day15.zig");
+};
+
+pub fn main() !void {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    var inputDir = try std.fs.cwd().openDir("input", .{});
+    defer inputDir.close();
+    var start: i128 = undefined;
+    var stdout = std.io.getStdOut();
+
+    inline for (@typeInfo(Days).Struct.decls) |decl| {
+        const dayNumber = comptime std.fmt.parseInt(u8, decl.name[1..], 10) catch undefined;
+        const fileName = "day" ++ decl.name[1..] ++ ".txt";
+        var arena = std.heap.ArenaAllocator.init(gpa.allocator());
+        defer arena.deinit();
+        const file = try inputDir.openFile(fileName, .{ .mode = .read_only });
+        const buffer = try file.readToEndAlloc(arena.allocator(), std.math.maxInt(usize));
+        const module = comptime @field(Days, decl.name);
+
+        const hasPart1 = comptime hasField(module, "part1");
+        if (hasPart1) {
+            start = std.time.nanoTimestamp();
+            const result = try module.part1(buffer, arena.allocator());
+            const outputFormat = comptime switch (@typeInfo(@TypeOf(result))) {
+                .Pointer => |info| switch (info.size) {
+                    .Slice => "{s}",
+                    else => "{any}",
+                },
+                else => "{any}",
+            };
+            const dur = try prettyPrintTimeDiff(std.time.nanoTimestamp() - start, arena.allocator());
+            try std.fmt.format(stdout.writer(), "Day {d} Part 1 ({s}): " ++ outputFormat ++ "\n", .{ dayNumber, dur, result });
+        }
+
+        const hasPart2 = comptime hasField(module, "part2");
+        if (hasPart2) {
+            start = std.time.nanoTimestamp();
+            const result = try module.part2(buffer, arena.allocator());
+            const outputFormat = comptime switch (@typeInfo(@TypeOf(result))) {
+                .Pointer => |info| switch (info.size) {
+                    .Slice => "{s}",
+                    else => "{any}",
+                },
+                else => "{any}",
+            };
+            const dur = try prettyPrintTimeDiff(std.time.nanoTimestamp() - start, arena.allocator());
+            try std.fmt.format(stdout.writer(), "Day {d} Part 2 ({s}): " ++ outputFormat ++ "\n", .{ dayNumber, dur, result });
+        }
+    }
+}
+
+fn hasField(comptime T: type, comptime name: []const u8) bool {
+    for (std.meta.declarations(T)) |decl| {
+        if (std.mem.eql(u8, decl.name, name)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+fn prettyPrintTimeDiff(nanoDiff: i128, allocator: std.mem.Allocator) ![]const u8 {
+    var floatDiff = std.math.lossyCast(f64, nanoDiff);
+
+    var output = std.ArrayList(u8).init(allocator);
+    var writer = output.writer();
+
+    if (@divFloor(nanoDiff, std.time.ns_per_min) > 0) {
+        try std.fmt.format(writer, "{}min ", .{@divFloor(nanoDiff, std.time.ns_per_min)});
+        try std.fmt.format(writer, "{d}s", .{@rem(@ceil(floatDiff / std.time.ns_per_s), std.time.s_per_min)});
+        return output.toOwnedSlice();
+    }
+
+    // Trim number to only have 3 significant bytes
+    try std.fmt.format(writer, "{d}", .{floatDiff});
+
+    const exponent = std.math.lossyCast(f64, @max(output.items.len - 3, 0));
+    const denominator = std.math.pow(f64, 10, exponent);
+    floatDiff = try std.math.divCeil(f64, floatDiff, denominator);
+    floatDiff *= denominator;
+    output.clearRetainingCapacity();
+
+    if (@divFloor(floatDiff, std.time.ns_per_s) >= 1) {
+        try std.fmt.format(writer, "{d}s", .{@ceil(floatDiff / std.time.ns_per_s * 100) / 100});
+        return output.toOwnedSlice();
+    }
+    if (@divFloor(floatDiff, std.time.ns_per_ms) >= 1) {
+        try std.fmt.format(writer, "{d}ms", .{@ceil(floatDiff / std.time.ns_per_ms * 100) / 100});
+        return output.toOwnedSlice();
+    }
+    if (@divFloor(floatDiff, std.time.ns_per_us) >= 1) {
+        try std.fmt.format(writer, "{d}us", .{@ceil(floatDiff / std.time.ns_per_us * 100) / 100});
+        return output.toOwnedSlice();
+    } else {
+        try std.fmt.format(writer, "{d}ns", .{floatDiff});
+    }
+
+    return output.toOwnedSlice();
+}
+
+test "prettyPrint minutes" {
+    const result = try prettyPrintTimeDiff(std.time.ns_per_ms * 61100, std.testing.allocator);
+    defer std.testing.allocator.free(result);
+    try std.testing.expectEqualSlices(u8, "1min 2s", result);
+}
+
+test "prettyPrint seconds" {
+    const result = try prettyPrintTimeDiff(std.time.ns_per_ms * 5111, std.testing.allocator);
+    defer std.testing.allocator.free(result);
+    try std.testing.expectEqualSlices(u8, "5.12s", result);
+}
+
+test "prettyPrint ms" {
+    const result = try prettyPrintTimeDiff(std.time.ns_per_us * 15122, std.testing.allocator);
+    defer std.testing.allocator.free(result);
+    try std.testing.expectEqualSlices(u8, "15.2ms", result);
+}
+
+test "prettyPrint us" {
+    const result = try prettyPrintTimeDiff(8555, std.testing.allocator);
+    defer std.testing.allocator.free(result);
+    try std.testing.expectEqualSlices(u8, "8.56us", result);
+}
+
+test "prettyPrint ns" {
+    const result = try prettyPrintTimeDiff(999, std.testing.allocator);
+    defer std.testing.allocator.free(result);
+    try std.testing.expectEqualSlices(u8, "999ns", result);
+}
+
+test "simple test" {
+    var list = std.ArrayList(i32).init(std.testing.allocator);
+    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
+    try list.append(42);
+    try std.testing.expectEqual(@as(i32, 42), list.pop());
+}
