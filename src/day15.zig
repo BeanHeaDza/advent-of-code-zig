@@ -4,7 +4,7 @@ const ArrayList = std.ArrayList;
 const testing = std.testing;
 const print = std.debug.print;
 
-const DEBUG = true;
+const DEBUG = false;
 
 pub fn part1(input: []const u8, allocator: Allocator) !u32 {
     return solve1(input, allocator, 2000000);
@@ -12,12 +12,12 @@ pub fn part1(input: []const u8, allocator: Allocator) !u32 {
 
 fn solve1(input: []const u8, allocator: Allocator, row: i32) !u32 {
     var sensors = try parseInput(input, allocator);
-    defer sensors.deinit();
+    defer allocator.free(sensors);
 
     var ranges = ArrayList(@Vector(2, i32)).init(allocator);
     defer ranges.deinit();
 
-    for (sensors.items) |sensor| {
+    for (sensors) |sensor| {
         const diff = std.math.cast(i32, @abs(sensor.sensor[1] - row)) orelse return error.BadInput;
         const x: i32 = sensor.radius - diff;
         if (x < 0) {} else if (x == 0 and sensor.closestBeacon[1] == row) {} else {
@@ -63,65 +63,65 @@ fn lessThan(_: void, lhs: @Vector(2, i32), rhs: @Vector(2, i32)) bool {
     return lhs[0] < rhs[0];
 }
 
-pub fn part2(input: []const u8, allocator: Allocator) !u32 {
+pub fn part2(input: []const u8, allocator: Allocator) !i64 {
     return solve2(input, allocator, 4000000);
 }
 
-fn solve2(input: []const u8, allocator: Allocator, height: i32) !u32 {
-    _ = height;
+fn solve2(input: []const u8, allocator: Allocator, clamp: i32) !i64 {
     if (DEBUG) print("\n", .{});
     var sensors = try parseInput(input, allocator);
     defer allocator.free(sensors);
 
-    var x: usize = 0;
-    while (x < sensors.len) : (x += 1) {
-        const leftSensor = sensors[x];
-        var y: usize = x + 1;
-        while (y < sensors.len) : (y += 1) {
-            const rightSensor = sensors[y];
-            // Check if overlapping
-            const distance = manhattanDistance(i32, leftSensor.sensor, rightSensor.sensor) orelse return error.BadInput;
-            if (distance > leftSensor.radius + rightSensor.radius)
+    var positiveLineCs = std.AutoHashMap(i32, void).init(allocator);
+    defer positiveLineCs.deinit();
+    var negativeLineCs = std.AutoHashMap(i32, void).init(allocator);
+    defer negativeLineCs.deinit();
+
+    var i: usize = 0;
+    while (i < sensors.len) : (i += 1) {
+        const sensor = sensors[i];
+        const left: @Vector(2, i32) = sensor.sensor + [2]i32{ -sensor.radius - 1, 0 };
+        const right: @Vector(2, i32) = sensor.sensor + [2]i32{ sensor.radius + 1, 0 };
+
+        // y = mx + c
+        // For m=1:  c = y - x
+        // For m=-1:  c = y + x
+        try positiveLineCs.put(left[1] - left[0], {});
+        try negativeLineCs.put(left[1] + left[0], {});
+        try positiveLineCs.put(right[1] - right[0], {});
+        try negativeLineCs.put(right[1] + right[0], {});
+    }
+
+    var positiveC = positiveLineCs.keyIterator();
+    while (positiveC.next()) |c1| {
+        var negativeC = negativeLineCs.keyIterator();
+        search: while (negativeC.next()) |c2| {
+            // y1 = x1 + c1
+            // y2 = -x2 + c2
+            // x + c1 = -x + c2
+            // 2x = c2 - c1
+            const xTimes2 = c2.* - c1.*;
+            if (@mod(xTimes2, 2) != 0) {
                 continue;
+            }
 
-            if (DEBUG) print("Sensor {any} with radius {}, overlaps sensor {any} with radius {}, distance between sensors {any}\n", .{ leftSensor.sensor, leftSensor.radius, rightSensor.sensor, rightSensor.radius, manhattanDistance(i32, leftSensor.sensor, rightSensor.sensor) });
-
-            var up: @Vector(2, i32) = leftSensor.sensor + [2]i32{ 0, leftSensor.radius + 1 };
-            var down: @Vector(2, i32) = leftSensor.sensor + [2]i32{ 0, -leftSensor.radius - 1 };
-            var right: @Vector(2, i32) = leftSensor.sensor + [2]i32{ leftSensor.radius + 1, 0 };
-            var left: @Vector(2, i32) = leftSensor.sensor + [2]i32{ -leftSensor.radius - 1, 0 };
-
-            var currentPos = up;
-            var modifier: @Vector(2, i32) = [2]i32{ 1, -1 };
-            _ = modifier;
-            while (!std.meta.eql(currentPos, right)) : (currentPos += [2]i32{ 1, -1 }) {
-                // TODO: Better loop logic here
-                if (manhattanDistance(i32, currentPos, rightSensor.sensor) == rightSensor.radius + 1) {
-                    if (DEBUG) print("  intersection point {any}\n", .{currentPos});
+            const x = @divExact(xTimes2, 2);
+            const y = x + c1.*;
+            if (x < 0 or x > clamp or y < 0 or y > clamp) {
+                continue;
+            }
+            const possibleBeacon = @Vector(2, i32){ x, y };
+            for (sensors) |sensor| {
+                const distance = manhattanDistance(i32, sensor.sensor, possibleBeacon) orelse return error.BadManhanttan;
+                if (distance <= sensor.radius) {
+                    continue :search;
                 }
             }
-            while (!std.meta.eql(currentPos, down)) : (currentPos += [2]i32{ -1, -1 }) {
-                // TODO: Better loop logic here
-                if (manhattanDistance(i32, currentPos, rightSensor.sensor) == rightSensor.radius + 1) {
-                    if (DEBUG) print("  intersection point {any}\n", .{currentPos});
-                }
-            }
-            while (!std.meta.eql(currentPos, left)) : (currentPos += [2]i32{ -1, 1 }) {
-                // TODO: Better loop logic here
-                if (manhattanDistance(i32, currentPos, rightSensor.sensor) == rightSensor.radius + 1) {
-                    if (DEBUG) print("  intersection point {any}\n", .{currentPos});
-                }
-            }
-            while (!std.meta.eql(currentPos, up)) : (currentPos += [2]i32{ 1, 1 }) {
-                // TODO: Better loop logic here
-                if (manhattanDistance(i32, currentPos, rightSensor.sensor) == rightSensor.radius + 1) {
-                    if (DEBUG) print("  intersection point {any}\n", .{currentPos});
-                }
-            }
+            return @as(i64, x) * 4000000 + y;
         }
     }
 
-    return 56000011;
+    return error.AnswerNotFound;
 }
 
 const Input = struct {
@@ -178,7 +178,7 @@ test "parseInput" {
 test "Part 2 example" {
     var result = try solve2(testInput, testing.allocator, 20);
 
-    try std.testing.expectEqual(@as(u32, 56000011), result);
+    try std.testing.expectEqual(@as(i64, 56000011), result);
 }
 
 const testInput =
