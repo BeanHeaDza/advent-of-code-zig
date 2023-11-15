@@ -84,7 +84,7 @@ inline fn calcHeight(char: u8) u8 {
     };
 }
 
-fn getConnected(context: *Context, node: usize) anyerror![]const Dijkstra.Edge {
+fn getConnected(context: *Context, node: usize) anyerror![]Dijkstra.Edge {
     const char = context.input[node];
     const height: u8 = calcHeight(char);
     var edges = [_]Dijkstra.Edge{undefined} ** 4;
@@ -138,7 +138,7 @@ fn getConnected(context: *Context, node: usize) anyerror![]const Dijkstra.Edge {
     return result;
 }
 
-fn getConnectedDown(context: *Context, node: usize) anyerror![]const Dijkstra.Edge {
+fn getConnectedDown(context: *Context, node: usize) anyerror![]Dijkstra.Edge {
     const char = context.input[node];
     const height: u8 = calcHeight(char);
     var edges = [_]Dijkstra.Edge{undefined} ** 4;

@@ -32,7 +32,7 @@ pub fn AutoDijkstra(comptime NodeType: type, comptime DistanceType: type, compti
             self.doneNodes.deinit();
         }
 
-        pub fn solve(self: *Self, start: NodeType, end: EndNode, comptime getConnected: fn (context: *Context, n: NodeType) anyerror![]const Edge) !DistanceType {
+        pub fn solve(self: *Self, start: NodeType, end: EndNode, comptime getConnected: fn (context: *Context, n: NodeType) anyerror![]Edge) !DistanceType {
             self.doneNodes.clearRetainingCapacity();
             self.queue.shrinkAndFree(self.queue.capacity());
 
@@ -57,7 +57,7 @@ pub fn AutoDijkstra(comptime NodeType: type, comptime DistanceType: type, compti
                     const newPriority = edge.distance + next.distance;
                     // std.mem.indexOfScalar(NodeType, slice: []const T, value: T)
                     const isEndNode = switch (end) {
-                        .single => |n| next.node == n,
+                        .single => |n| std.meta.eql(next.node, n),
                         .multiple => |nodes| std.mem.indexOfScalar(NodeType, nodes, next.node) != null,
                     };
                     if (DEBUG) std.debug.print("Is end node {}: {}\n", .{ next.node, isEndNode });
@@ -75,10 +75,10 @@ pub fn AutoDijkstra(comptime NodeType: type, comptime DistanceType: type, compti
     };
 }
 
-const MyContext = struct { edges: []const []const PathFinder.Edge };
+const MyContext = struct { edges: [][]PathFinder.Edge };
 const PathFinder = AutoDijkstra(usize, u32, MyContext);
 
-fn getConnectedNodes(context: *MyContext, n: usize) ![]const PathFinder.Edge {
+fn getConnectedNodes(context: *MyContext, n: usize) ![]PathFinder.Edge {
     return context.edges.ptr[n - 1];
 }
 
