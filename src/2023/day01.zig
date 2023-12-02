@@ -46,36 +46,17 @@ pub fn part2(input: []const u8, allocator: std.mem.Allocator) !u32 {
 
 fn getFakeDigitAtIndex(line: []const u8, index: usize) ?u8 {
     const c = line[index];
-    // I should check if doing a inline for (comptime) would still execute in the same time as this code
     if (c >= '1' and c <= '9') {
         return c - '0';
-    } else if (eql(line, index, "one")) {
-        return 1;
-    } else if (eql(line, index, "two")) {
-        return 2;
-    } else if (eql(line, index, "three")) {
-        return 3;
-    } else if (eql(line, index, "four")) {
-        return 4;
-    } else if (eql(line, index, "five")) {
-        return 5;
-    } else if (eql(line, index, "six")) {
-        return 6;
-    } else if (eql(line, index, "seven")) {
-        return 7;
-    } else if (eql(line, index, "eight")) {
-        return 8;
-    } else if (eql(line, index, "nine")) {
-        return 9;
+    }
+
+    inline for ([_][]const u8{ "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" }, 1..) |digitText, digitValue| {
+        const value = comptime std.math.cast(u8, digitValue) orelse @compileError("Failed to cast value to u8");
+        if (line.len >= index + digitText.len and line[index] == digitText[0] and std.mem.eql(u8, line[index .. index + digitText.len], digitText)) {
+            return value;
+        }
     }
     return null;
-}
-
-inline fn eql(line: []const u8, offset: usize, comptime value: []const u8) bool {
-    if (line.len < offset + value.len or line[offset] != value[0]) {
-        return false;
-    }
-    return std.mem.eql(u8, line[offset .. offset + value.len], value);
 }
 
 test "Part 1 example" {
@@ -106,13 +87,3 @@ const testInput2 =
     \\zoneight234
     \\7pqrstsixteen
 ;
-
-test "reverse while loop" {
-    const input = "abc";
-    var index: usize = input.len - 1;
-
-    var aIndex: ?usize = null;
-    while (aIndex == null) : (index -= 1) {
-        if (input[index] == 'a') {}
-    }
-}
