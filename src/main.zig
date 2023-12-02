@@ -1,39 +1,42 @@
 const std = @import("std");
 
-const Days = struct {
-    pub const d01 = @import("./day01.zig");
-    pub const d02 = @import("./day02.zig");
-    pub const d03 = @import("./day03.zig");
-    pub const d04 = @import("./day04.zig");
-    pub const d05 = @import("./day05.zig");
-    pub const d06 = @import("./day06.zig");
-    pub const d07 = @import("./day07.zig");
-    pub const d08 = @import("./day08.zig");
-    pub const d09 = @import("./day09.zig");
-    pub const d10 = @import("./day10.zig");
-    pub const d11 = @import("./day11.zig");
-    pub const d12 = @import("./day12.zig");
-    pub const d13 = @import("./day13.zig");
-    pub const d14 = @import("./day14.zig");
-    pub const d15 = @import("./day15.zig");
+const Days2022 = struct {
+    pub const d01 = @import("./2022/day01.zig");
+    pub const d02 = @import("./2022/day02.zig");
+    pub const d03 = @import("./2022/day03.zig");
+    pub const d04 = @import("./2022/day04.zig");
+    pub const d05 = @import("./2022/day05.zig");
+    pub const d06 = @import("./2022/day06.zig");
+    pub const d07 = @import("./2022/day07.zig");
+    pub const d08 = @import("./2022/day08.zig");
+    pub const d09 = @import("./2022/day09.zig");
+    pub const d10 = @import("./2022/day10.zig");
+    pub const d11 = @import("./2022/day11.zig");
+    pub const d12 = @import("./2022/day12.zig");
+    pub const d13 = @import("./2022/day13.zig");
+    pub const d14 = @import("./2022/day14.zig");
+    pub const d15 = @import("./2022/day15.zig");
 };
+
+const TargetYear = Days2022;
+const TARGET_INPUT_DIR = "input/2022";
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
-    var inputDir = try std.fs.cwd().openDir("input", .{});
+    var inputDir = try std.fs.cwd().openDir(TARGET_INPUT_DIR, .{});
     defer inputDir.close();
     var start: i128 = undefined;
     var stdout = std.io.getStdOut();
 
-    inline for (@typeInfo(Days).Struct.decls) |decl| {
+    inline for (@typeInfo(TargetYear).Struct.decls) |decl| {
         const dayNumber = comptime std.fmt.parseInt(u8, decl.name[1..], 10) catch undefined;
         const fileName = "day" ++ decl.name[1..] ++ ".txt";
         var arena = std.heap.ArenaAllocator.init(gpa.allocator());
         defer arena.deinit();
         const file = try inputDir.openFile(fileName, .{ .mode = .read_only });
         const buffer = try file.readToEndAlloc(arena.allocator(), std.math.maxInt(usize));
-        const module = comptime @field(Days, decl.name);
+        const module = comptime @field(TargetYear, decl.name);
 
         const hasPart1 = comptime hasField(module, "part1");
         if (hasPart1) {

@@ -1,5 +1,5 @@
 const std = @import("std");
-const readInt = @import("./util.zig").readInt;
+const readInt = @import("../util.zig").readInt;
 
 pub fn part1(input: []const u8, allocator: std.mem.Allocator) !u32 {
     _ = allocator;
