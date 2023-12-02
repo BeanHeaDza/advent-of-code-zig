@@ -17,9 +17,12 @@ const Days2022 = struct {
     pub const d14 = @import("./2022/day14.zig");
     pub const d15 = @import("./2022/day15.zig");
 };
+const Days2023 = struct {
+    pub const d01 = @import("./2023/day01.zig");
+};
 
-const TargetYear = Days2022;
-const TARGET_INPUT_DIR = "input/2022";
+const TargetYear = Days2023;
+const TARGET_INPUT_DIR = "input/2023";
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
