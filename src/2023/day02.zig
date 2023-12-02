@@ -110,6 +110,16 @@ test "Parse" {
     try std.testing.expectEqualDeep(expected, result.games[0]);
 }
 
+test "Error Parse" {
+    const badInput =
+        \\Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+        \\Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+        \\Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 x, 13 green; 5 green, 1 red
+    ;
+    const result = parse(badInput, std.testing.allocator);
+    try std.testing.expectError(error.BadInput, result);
+}
+
 test "Part 1 example" {
     var result = try part1(testInput, std.testing.allocator);
 
