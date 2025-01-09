@@ -1,29 +1,33 @@
 const std = @import("std");
 
-const Days2022 = struct {
-    pub const d01 = @import("./2022/day01.zig");
-    pub const d02 = @import("./2022/day02.zig");
-    pub const d03 = @import("./2022/day03.zig");
-    pub const d04 = @import("./2022/day04.zig");
-    pub const d05 = @import("./2022/day05.zig");
-    pub const d06 = @import("./2022/day06.zig");
-    pub const d07 = @import("./2022/day07.zig");
-    pub const d08 = @import("./2022/day08.zig");
-    pub const d09 = @import("./2022/day09.zig");
-    pub const d10 = @import("./2022/day10.zig");
-    pub const d11 = @import("./2022/day11.zig");
-    pub const d12 = @import("./2022/day12.zig");
-    pub const d13 = @import("./2022/day13.zig");
-    pub const d14 = @import("./2022/day14.zig");
-    pub const d15 = @import("./2022/day15.zig");
-};
-const Days2023 = struct {
-    pub const d01 = @import("./2023/day01.zig");
-    pub const d02 = @import("./2023/day02.zig");
+// const Days2022 = struct {
+//     pub const d01 = @import("./2022/day01.zig");
+//     pub const d02 = @import("./2022/day02.zig");
+//     pub const d03 = @import("./2022/day03.zig");
+//     pub const d04 = @import("./2022/day04.zig");
+//     pub const d05 = @import("./2022/day05.zig");
+//     pub const d06 = @import("./2022/day06.zig");
+//     pub const d07 = @import("./2022/day07.zig");
+//     pub const d08 = @import("./2022/day08.zig");
+//     pub const d09 = @import("./2022/day09.zig");
+//     pub const d10 = @import("./2022/day10.zig");
+//     pub const d11 = @import("./2022/day11.zig");
+//     pub const d12 = @import("./2022/day12.zig");
+//     pub const d13 = @import("./2022/day13.zig");
+//     pub const d14 = @import("./2022/day14.zig");
+//     pub const d15 = @import("./2022/day15.zig");
+// };
+// const Days2023 = struct {
+//     pub const d01 = @import("./2023/day01.zig");
+//     pub const d02 = @import("./2023/day02.zig");
+// };
+const Days2024 = struct {
+    pub const d01 = @import("./2024/day01.zig");
+    pub const d02 = @import("./2024/day02.zig");
 };
 
-const TargetYear = Days2023;
-const TARGET_INPUT_DIR = "input/2023";
+const TargetYear = Days2024;
+const TARGET_INPUT_DIR = "input/2024";
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -87,7 +91,7 @@ fn prettyPrintTimeDiff(nanoDiff: i128, allocator: std.mem.Allocator) ![]const u8
     var floatDiff = std.math.lossyCast(f64, nanoDiff);
 
     var output = std.ArrayList(u8).init(allocator);
-    var writer = output.writer();
+    const writer = output.writer();
 
     if (@divFloor(nanoDiff, std.time.ns_per_min) > 0) {
         try std.fmt.format(writer, "{}min ", .{@divFloor(nanoDiff, std.time.ns_per_min)});
@@ -98,7 +102,7 @@ fn prettyPrintTimeDiff(nanoDiff: i128, allocator: std.mem.Allocator) ![]const u8
     // Trim number to only have 3 significant bytes
     try std.fmt.format(writer, "{d}", .{floatDiff});
 
-    const exponent = std.math.lossyCast(f64, @max(output.items.len - 3, 0));
+    const exponent = std.math.lossyCast(f64, if (output.items.len > 3) output.items.len - 3 else 0);
     const denominator = std.math.pow(f64, 10, exponent);
     floatDiff = try std.math.divCeil(f64, floatDiff, denominator);
     floatDiff *= denominator;
