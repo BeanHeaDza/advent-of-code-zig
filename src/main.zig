@@ -1,4 +1,7 @@
 const std = @import("std");
+const builtin = @import("builtin");
+
+pub extern "kernel32" fn GetSystemTimePreciseAsFileTime(*std.os.windows.FILETIME) callconv(std.os.windows.WINAPI) void;
 
 // const Days2022 = struct {
 //     pub const d01 = @import("./2022/day01.zig");
@@ -49,7 +52,7 @@ pub fn main() !void {
 
         const hasPart1 = comptime hasField(module, "part1");
         if (hasPart1) {
-            start = std.time.nanoTimestamp();
+            start = nanoTimestamp();
             const result = try module.part1(buffer, arena.allocator());
             const outputFormat = comptime switch (@typeInfo(@TypeOf(result))) {
                 .Pointer => |info| switch (info.size) {
@@ -58,13 +61,13 @@ pub fn main() !void {
                 },
                 else => "{any}",
             };
-            const dur = try prettyPrintTimeDiff(std.time.nanoTimestamp() - start, arena.allocator());
+            const dur = try prettyPrintTimeDiff(nanoTimestamp() - start, arena.allocator());
             try std.fmt.format(stdout.writer(), "Day {d} Part 1 ({s}): " ++ outputFormat ++ "\n", .{ dayNumber, dur, result });
         }
 
         const hasPart2 = comptime hasField(module, "part2");
         if (hasPart2) {
-            start = std.time.nanoTimestamp();
+            start = nanoTimestamp();
             const result = try module.part2(buffer, arena.allocator());
             const outputFormat = comptime switch (@typeInfo(@TypeOf(result))) {
                 .Pointer => |info| switch (info.size) {
@@ -73,7 +76,7 @@ pub fn main() !void {
                 },
                 else => "{any}",
             };
-            const dur = try prettyPrintTimeDiff(std.time.nanoTimestamp() - start, arena.allocator());
+            const dur = try prettyPrintTimeDiff(nanoTimestamp() - start, arena.allocator());
             try std.fmt.format(stdout.writer(), "Day {d} Part 2 ({s}): " ++ outputFormat ++ "\n", .{ dayNumber, dur, result });
         }
     }
@@ -125,6 +128,20 @@ fn prettyPrintTimeDiff(nanoDiff: i128, allocator: std.mem.Allocator) ![]const u8
     }
 
     return output.toOwnedSlice();
+}
+
+fn nanoTimestamp() i128 {
+    if (builtin.os.tag != .windows) {
+        return std.time.nanoTimestamp();
+    }
+
+    // FileTime has a granularity of 100 nanoseconds and uses the NTFS/Windows epoch,
+    // which is 1601-01-01.
+    const epoch_adj = std.time.epoch.windows * (std.time.ns_per_s / 100);
+    var ft: std.os.windows.FILETIME = undefined;
+    GetSystemTimePreciseAsFileTime(&ft);
+    const ft64 = (@as(u64, ft.dwHighDateTime) << 32) | ft.dwLowDateTime;
+    return @as(i128, @as(i64, @bitCast(ft64)) + epoch_adj) * 100;
 }
 
 test "prettyPrint minutes" {
