@@ -28,6 +28,7 @@ const Days2024 = struct {
     pub const d01 = @import("./2024/day01.zig");
     pub const d02 = @import("./2024/day02.zig");
     pub const d03 = @import("./2024/day03.zig");
+    pub const d04 = @import("./2024/day04.zig");
 };
 
 const TargetYear = Days2024;
@@ -172,11 +173,4 @@ test "prettyPrint ns" {
     const result = try prettyPrintTimeDiff(999, std.testing.allocator);
     defer std.testing.allocator.free(result);
     try std.testing.expectEqualSlices(u8, "999ns", result);
-}
-
-test "simple test" {
-    var list = std.ArrayList(i32).init(std.testing.allocator);
-    defer list.deinit(); // try commenting this out and see if zig detects the memory leak!
-    try list.append(42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
 }
