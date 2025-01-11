@@ -109,7 +109,7 @@ fn parseInput(input: []const u8, allocator: Allocator) !Input {
 
     while (lines.next()) |line| {
         if (eql(line, "$ cd ..")) {
-            var lastChar = while (path.popOrNull()) |c| switch (c) {
+            const lastChar = while (path.popOrNull()) |c| switch (c) {
                 '/' => break c,
                 else => continue,
             } else null;
@@ -123,14 +123,14 @@ fn parseInput(input: []const u8, allocator: Allocator) !Input {
             try path.appendSlice(line[5..]);
         } else {
             var words = std.mem.splitScalar(u8, line, ' ');
-            var first = words.next() orelse continue;
+            const first = words.next() orelse continue;
             const fileSize = std.fmt.parseInt(u32, first, 10) catch continue;
             if (!pathSelfSize.contains(path.items)) {
-                var key = try keyAllocator.alloc(u8, path.items.len);
+                const key = try keyAllocator.alloc(u8, path.items.len);
                 @memcpy(key, path.items);
                 try pathSelfSize.put(key, 0);
             }
-            var pathSize: *u32 = pathSelfSize.getPtr(path.items) orelse return error.ItemNotFound;
+            const pathSize: *u32 = pathSelfSize.getPtr(path.items) orelse return error.ItemNotFound;
             pathSize.* += fileSize;
         }
     }
@@ -178,13 +178,13 @@ test "Should parse correctly" {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 95437), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 24933642), result);
 }

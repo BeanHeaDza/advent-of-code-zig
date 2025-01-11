@@ -102,7 +102,7 @@ fn getRocks(input: []const u8, allocator: Allocator) !Set {
         try result.put(previous, {});
         while (points.next()) |pointText| {
             const point = try toPoint(pointText);
-            var diff = @min(@max(Vector{ -1, -1 }, point - previous), Vector{ 1, 1 });
+            const diff = @min(@max(Vector{ -1, -1 }, point - previous), Vector{ 1, 1 });
             while (!std.meta.eql(previous, point)) {
                 previous += diff;
                 try result.put(previous, {});
@@ -127,13 +127,13 @@ test "Get rocks" {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 24), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 93), result);
 }

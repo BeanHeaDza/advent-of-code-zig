@@ -12,11 +12,16 @@
 		"body": [
 			"var lines = std.mem.splitScalar(u8, input, '\\n');",
 			"while (lines.next()) |line| {",
-			"\t_ = line;"
+			"\t_ = line; // autofix",
 			"\t$0",
 			"}"
 		],
 		"description": "Splits `input` on the '\n' scalar"
+	},
+	"Expect Equal": {
+		"scope": "zig",
+		"prefix": "expect-equal",
+		"body": "try std.testing.expectEqual($1, $2);"
 	},
 	"Boilerplate for a new day": {
 		"scope": "zig",
@@ -25,14 +30,14 @@
 			"const std = @import(\"std\");",
 			"",
 			"pub fn part1(input: []const u8, allocator: std.mem.Allocator) !u32 {",
-			"\t_ = allocator;",
-			"\t_ = input;",
+			"\t_ = allocator; // autofix",
+			"\t_ = input; // autofix",
 			"\t$0",
 			"\treturn 0;",
 			"}",
 			"",
 			"test \"Part 1 example\" {",
-			"\tvar result = try part1(testInput, std.testing.allocator);",
+			"\tconst result = try part1(testInput, std.testing.allocator);",
 			"",
 			"\ttry std.testing.expectEqual(@as(u32, 0), result);",
 			"}",

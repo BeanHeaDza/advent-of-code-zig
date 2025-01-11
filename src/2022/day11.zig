@@ -41,12 +41,12 @@ pub fn part1(input: []const u8, allocator: Allocator) !u64 {
                 var item: u64 = x;
                 monkey.inspections += 1;
                 var words = std.mem.splitScalar(u8, monkey.operation, ' ');
-                var leftWord = words.first();
-                var left = if (eql(leftWord, "old")) item else try std.fmt.parseInt(u64, leftWord, 10);
-                var opWord = words.next() orelse return error.InvalidOperation;
-                var op = opWord[0];
-                var rightWord = words.next() orelse return error.InvalidOperation;
-                var right = if (eql(rightWord, "old")) item else try std.fmt.parseInt(u64, rightWord, 10);
+                const leftWord = words.first();
+                const left = if (eql(leftWord, "old")) item else try std.fmt.parseInt(u64, leftWord, 10);
+                const opWord = words.next() orelse return error.InvalidOperation;
+                const op = opWord[0];
+                const rightWord = words.next() orelse return error.InvalidOperation;
+                const right = if (eql(rightWord, "old")) item else try std.fmt.parseInt(u64, rightWord, 10);
                 item = switch (op) {
                     '+' => left + right,
                     '-' => left - right,
@@ -90,12 +90,12 @@ pub fn part2(input: []const u8, allocator: Allocator) !u64 {
                 var item: u64 = x;
                 monkey.inspections += 1;
                 var words = std.mem.splitScalar(u8, monkey.operation, ' ');
-                var leftWord = words.first();
-                var left = if (eql(leftWord, "old")) item else try std.fmt.parseInt(u64, leftWord, 10);
-                var opWord = words.next() orelse return error.InvalidOperation;
-                var op = opWord[0];
-                var rightWord = words.next() orelse return error.InvalidOperation;
-                var right = if (eql(rightWord, "old")) item else try std.fmt.parseInt(u64, rightWord, 10);
+                const leftWord = words.first();
+                const left = if (eql(leftWord, "old")) item else try std.fmt.parseInt(u64, leftWord, 10);
+                const opWord = words.next() orelse return error.InvalidOperation;
+                const op = opWord[0];
+                const rightWord = words.next() orelse return error.InvalidOperation;
+                const right = if (eql(rightWord, "old")) item else try std.fmt.parseInt(u64, rightWord, 10);
                 item = switch (op) {
                     '+' => left + right,
                     '-' => left - right,
@@ -150,7 +150,7 @@ fn parseInput(input: []const u8, allocator: Allocator) !Monkeys {
         // Operation
         const operationLine = lines.next() orelse return error.InvalidInput;
         const operationStart = comptime "  Operation: new = ".len;
-        var operation = try allocator.dupe(u8, operationLine[operationStart..]);
+        const operation = try allocator.dupe(u8, operationLine[operationStart..]);
         errdefer allocator.free(operation);
 
         // Divisor
@@ -171,7 +171,7 @@ fn parseInput(input: []const u8, allocator: Allocator) !Monkeys {
         // empty line
         _ = lines.next();
 
-        var monkey = Monkey{
+        const monkey = Monkey{
             .items = items,
             .operation = operation,
             .testDenominator = testDenominator,
@@ -199,18 +199,18 @@ test "Parse input" {
 }
 
 test "Should clean up memory when parsing fails" {
-    var result = parseInput(brokenInput, testing.allocator);
+    const result = parseInput(brokenInput, testing.allocator);
     try testing.expectError(error.InvalidInput, result);
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u64, 10605), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u64, 2713310158), result);
 }

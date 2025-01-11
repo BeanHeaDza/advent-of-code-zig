@@ -18,7 +18,7 @@ pub fn part1(input: []const u8, allocator: Allocator) ![]const u8 {
         parsed.print();
     }
     var result = ArrayList(u8).init(allocator);
-    var to = parsed.crates.count();
+    const to = parsed.crates.count();
     for (0..to) |i| {
         const crateId: u8 = @intCast(i + 1);
         var crate: ArrayList(u8) = parsed.crates.get(crateId) orelse return error.CrateNotFound;
@@ -43,7 +43,7 @@ pub fn part2(input: []const u8, allocator: Allocator) ![]const u8 {
         parsed.print();
     }
     var result = ArrayList(u8).init(allocator);
-    var to = parsed.crates.count();
+    const to = parsed.crates.count();
     for (0..to) |i| {
         const crateId: u8 = @intCast(i + 1);
         var crate: ArrayList(u8) = parsed.crates.get(crateId) orelse return error.CrateNotFound;
@@ -74,7 +74,7 @@ const Input = struct {
     }
 
     fn addCrate(self: *Input, c: u8, i: u8) !void {
-        var x = try self.crates.getOrPut(i);
+        const x = try self.crates.getOrPut(i);
         if (!x.found_existing) {
             x.value_ptr.* = ArrayList(u8).init(self.allocator);
         }
@@ -156,14 +156,14 @@ test "Parses correctly" {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
     defer testing.allocator.free(result);
 
     try std.testing.expectEqualSlices(u8, "CMZ", result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
     defer testing.allocator.free(result);
 
     try std.testing.expectEqualSlices(u8, "MCD", result);

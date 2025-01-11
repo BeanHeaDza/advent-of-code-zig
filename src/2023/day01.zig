@@ -60,7 +60,7 @@ fn getFakeDigitAtIndex(line: []const u8, index: usize) ?u8 {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput1, std.testing.allocator);
+    const result = try part1(testInput1, std.testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 142), result);
 }
@@ -73,7 +73,7 @@ const testInput1 =
 ;
 
 test "Part 2 example" {
-    var result = try part2(testInput2, std.testing.allocator);
+    const result = try part2(testInput2, std.testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 281), result);
 }

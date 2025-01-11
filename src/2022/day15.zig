@@ -11,7 +11,7 @@ pub fn part1(input: []const u8, allocator: Allocator) !u32 {
 }
 
 fn solve1(input: []const u8, allocator: Allocator, row: i32) !u32 {
-    var sensors = try parseInput(input, allocator);
+    const sensors = try parseInput(input, allocator);
     defer allocator.free(sensors);
 
     var ranges = ArrayList(@Vector(2, i32)).init(allocator);
@@ -69,7 +69,7 @@ pub fn part2(input: []const u8, allocator: Allocator) !i64 {
 
 fn solve2(input: []const u8, allocator: Allocator, clamp: i32) !i64 {
     if (DEBUG) print("\n", .{});
-    var sensors = try parseInput(input, allocator);
+    const sensors = try parseInput(input, allocator);
     defer allocator.free(sensors);
 
     var positiveLineCs = std.AutoHashMap(i32, void).init(allocator);
@@ -160,7 +160,7 @@ fn manhattanDistance(comptime T: type, a: @Vector(2, T), b: @Vector(2, T)) ?T {
 }
 
 test "parseInput" {
-    var input = try parseInput(testInput, testing.allocator);
+    const input = try parseInput(testInput, testing.allocator);
     defer testing.allocator.free(input);
 
     try testing.expectEqual(@as(usize, 14), input.len);
@@ -170,13 +170,13 @@ test "parseInput" {
 }
 
 test "Part 1 example" {
-    var result = try solve1(testInput, testing.allocator, 10);
+    const result = try solve1(testInput, testing.allocator, 10);
 
     try std.testing.expectEqual(@as(u32, 26), result);
 }
 
 test "Part 2 example" {
-    var result = try solve2(testInput, testing.allocator, 20);
+    const result = try solve2(testInput, testing.allocator, 20);
 
     try std.testing.expectEqual(@as(i64, 56000011), result);
 }

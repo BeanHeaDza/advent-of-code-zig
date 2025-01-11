@@ -12,7 +12,7 @@ pub fn lcm(a: anytype, b: anytype) @TypeOf(a, b) {
     };
     std.debug.assert(a != 0 and b != 0);
 
-    var gcd: @TypeOf(a, b) = std.math.gcd(a, b);
+    const gcd: @TypeOf(a, b) = std.math.gcd(a, b);
     return a / gcd * b;
 }
 

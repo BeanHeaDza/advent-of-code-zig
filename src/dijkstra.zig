@@ -49,7 +49,7 @@ pub fn AutoDijkstra(comptime NodeType: type, comptime DistanceType: type, compti
                 if (DEBUG) std.debug.print("Checking node {}\n", .{edge.node});
                 try self.doneNodes.put(edge.node, {});
 
-                var edges = try getConnected(self.context, edge.node);
+                const edges = try getConnected(self.context, edge.node);
                 for (edges) |next| {
                     if (self.doneNodes.contains(next.node)) {
                         continue;

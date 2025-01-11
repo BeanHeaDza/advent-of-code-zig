@@ -81,13 +81,13 @@ fn step2(cycle: *i32, x: i32, output: *ArrayList(u8)) !void {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(i32, 13140), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
     defer testing.allocator.free(result);
     const output =
         \\

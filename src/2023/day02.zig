@@ -86,7 +86,7 @@ fn parse(input: []const u8, allocator: std.mem.Allocator) !Games {
             }
             try gameSubSets.append(cubes);
         }
-        var game = Game{ .number = gameNumber, .subsets = try gameSubSets.toOwnedSlice() };
+        const game = Game{ .number = gameNumber, .subsets = try gameSubSets.toOwnedSlice() };
         try games.append(game);
     }
     return Games{ .games = try games.toOwnedSlice(), .allocator = allocator };
@@ -121,13 +121,13 @@ test "Error Parse" {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, std.testing.allocator);
+    const result = try part1(testInput, std.testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 8), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, std.testing.allocator);
+    const result = try part2(testInput, std.testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 2286), result);
 }

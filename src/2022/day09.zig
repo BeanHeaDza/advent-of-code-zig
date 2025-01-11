@@ -83,19 +83,19 @@ const testInput2 =
 ;
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 13), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 1), result);
 }
 
 test "Part 2-2 example" {
-    var result = try part2(testInput2, testing.allocator);
+    const result = try part2(testInput2, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 36), result);
 }

@@ -131,13 +131,13 @@ const testInput =
 ;
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 21), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 8), result);
 }

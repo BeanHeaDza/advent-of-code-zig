@@ -20,10 +20,20 @@ pub extern "kernel32" fn GetSystemTimePreciseAsFileTime(*std.os.windows.FILETIME
 //     pub const d14 = @import("./2022/day14.zig");
 //     pub const d15 = @import("./2022/day15.zig");
 // };
+
 // const Days2023 = struct {
 //     pub const d01 = @import("./2023/day01.zig");
 //     pub const d02 = @import("./2023/day02.zig");
+//     pub const d03 = @import("./2023/day03.zig");
+//     pub const d04 = @import("./2023/day04.zig");
+//     pub const d05 = @import("./2023/day05.zig");
+//     pub const d06 = @import("./2023/day06.zig");
+//     pub const d07 = @import("./2023/day07.zig");
+//     pub const d08 = @import("./2023/day08.zig");
+//     pub const d09 = @import("./2023/day09.zig");
+//     pub const d10 = @import("./2023/day10.zig");
 // };
+
 const Days2024 = struct {
     pub const d01 = @import("./2024/day01.zig");
     pub const d02 = @import("./2024/day02.zig");

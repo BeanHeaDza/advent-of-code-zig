@@ -82,7 +82,7 @@ fn rightOrder(leftSlice: []const u8, rightSlice: []const u8) !?bool {
         const right = rightIter.next();
         if (right == null) return false;
 
-        var order = try rightOrder(left, right.?);
+        const order = try rightOrder(left, right.?);
         if (order != null) return order;
     }
     if (rightIter.next() != null) {
@@ -144,13 +144,13 @@ test "getListItems" {
 }
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(u32, 13), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(usize, 140), result);
 }

@@ -9,7 +9,7 @@ pub fn part1(input: []const u8, allocator: Allocator) !usize {
 
     while (window.next()) |w| {
         if (w[0] != w[1] and w[0] != w[2] and w[0] != w[3] and w[1] != w[2] and w[1] != w[3] and w[2] != w[3]) {
-            var index = window.index orelse return error.NotFound;
+            const index = window.index orelse return error.NotFound;
             return index + 3;
         }
     }
@@ -27,7 +27,7 @@ pub fn part2(input: []const u8, allocator: Allocator) !usize {
             if (tracking[c]) continue :label;
             tracking[c] = true;
         }
-        var index = window.index orelse return error.NotFound;
+        const index = window.index orelse return error.NotFound;
         return index + 13;
     }
     return error.NotFound;
@@ -38,13 +38,13 @@ const testInput =
 ;
 
 test "Part 1 example" {
-    var result = try part1(testInput, testing.allocator);
+    const result = try part1(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(usize, 7), result);
 }
 
 test "Part 2 example" {
-    var result = try part2(testInput, testing.allocator);
+    const result = try part2(testInput, testing.allocator);
 
     try std.testing.expectEqual(@as(usize, 19), result);
 }
