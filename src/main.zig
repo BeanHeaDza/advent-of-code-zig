@@ -40,6 +40,7 @@ const Days2024 = struct {
     pub const d03 = @import("./2024/day03.zig");
     pub const d04 = @import("./2024/day04.zig");
     pub const d05 = @import("./2024/day05.zig");
+    pub const d06 = @import("./2024/day06.zig");
 };
 
 const TargetYear = Days2024;
